@@ -31,7 +31,7 @@ exports.setup = function setup(options) {
   var env = options.env || DEFAULT_ENV;
   var hosts = options.hosts || ['github.com', 'bitbucket.org'];
 
-  if(options.env in process.env) {
+  if(env in process.env) {
     console.log('Detected SSH key for git. Adding SSH config.');
 
     // Ensure we have an SSH folder
@@ -77,8 +77,9 @@ exports.cleanup = function cleanup(options) {
     console.log('Cleaning up SSH config');
 
     // Remove the files we created
-    fs.unlinkSync(SSH_CONFIG_FILE);
-    fs.unlinkSync(SSH_KEY_FILE);
+    [SSH_CONFIG_FILE, SSH_KEY_FILE].forEach(function(file) {
+      try { fs.unlinkSync(file); } catch(e) {}
+    });
 
     // Clear sensitive private key from the environment
     delete process.env[env];
